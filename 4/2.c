@@ -98,30 +98,30 @@ Matrix getFilledMatrix(){
 }
 
 
-void freeMatrix(Matrix matrix) {
-    for (int i = 0; i < matrix.rows; i++) {
-        free(matrix.matrix[i]);
+void freeMatrix(Matrix *matrix) {
+    for (int i = 0; i < matrix->rows; i++) {
+        free(matrix->matrix[i]);
     }
-    free(matrix.matrix);
+    free(matrix->matrix);
 }
 
 
-void invertRow(int *row, size_t size){
-    for (int i = 0; i < size; i++){
+void invertRow(int *row, size_t *size){
+    for (int i = 0; i < *size; i++){
         row[i] *= -1;
     }
 }
 
 
-void rowHasPosNum(Matrix matrix){
-    for (int i = 1; i < matrix.rows; i++){
-        for (int j = 0; j < matrix.columns; j++){
-            if (matrix.matrix[i][j] > 0){
+void rowHasPosNum(Matrix *matrix){
+    for (int i = 1; i < matrix->rows; i++){
+        for (int j = 0; j < matrix->columns; j++){
+            if (matrix->matrix[i][j] > 0){
                 printf("Row number %d has positive number\n", i);
-                invertRow(matrix.matrix[i - 1], matrix.columns);
+                invertRow(matrix->matrix[i - 1], &(matrix->columns));
                 printf("Inverted row number %d: ", i - 1);
-                for (int g = 0; g < matrix.columns; g++)
-                    printf("%d ", matrix.matrix[i - 1][g]);
+                for (int g = 0; g < matrix->columns; g++)
+                    printf("%d ", matrix->matrix[i - 1][g]);
                 printf("\n");
                 break;
             }
@@ -132,6 +132,6 @@ void rowHasPosNum(Matrix matrix){
 
 int main(){
     Matrix matrix = getFilledMatrix();
-    rowHasPosNum(matrix);
-    freeMatrix(matrix);
+    rowHasPosNum(&matrix);
+    freeMatrix(&matrix);
 }
