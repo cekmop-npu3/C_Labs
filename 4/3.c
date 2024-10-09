@@ -13,8 +13,8 @@ typedef enum {
 
 typedef struct {
     int **matrix;
-    int rows;
-    int columns;
+    size_t rows;
+    size_t columns;
 } Matrix;
 
 
@@ -34,7 +34,7 @@ void throwException(char message[], size_t count, ...){
 
 
 Matrix createMatrix(){
-    int rows, columns;
+    size_t rows, columns;
     Matrix matrix;
     printf("Enter the number of rows: ");
     if (!scanf("%d", &rows))
@@ -131,4 +131,5 @@ int main(){
     Matrix matrix = getFilledMatrix();
     printf("Max element is %.1f", maxElemInUpperTrig(&matrix));
     freeMatrix(&matrix);
+    return EXIT_SUCCESS;
 }

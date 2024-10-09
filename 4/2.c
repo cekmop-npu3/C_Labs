@@ -34,7 +34,7 @@ void throwException(char message[], size_t count, ...){
 
 
 Matrix createMatrix(){
-    int rows, columns;
+    size_t rows, columns;
     Matrix matrix;
     printf("Enter the number of rows: ");
     if (!scanf("%d", &rows))
@@ -134,4 +134,5 @@ int main(){
     Matrix matrix = getFilledMatrix();
     rowHasPosNum(&matrix);
     freeMatrix(&matrix);
+    return EXIT_SUCCESS;
 }
