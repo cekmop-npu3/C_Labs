@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdbool.h>
 
 
 typedef enum {
@@ -13,8 +14,8 @@ typedef enum {
 
 typedef struct {
     int **matrix;
-    size_t rows;
-    size_t columns;
+    int rows;
+    int columns;
 } Matrix;
 
 
@@ -34,13 +35,13 @@ void throwException(char message[], size_t count, ...){
 
 
 Matrix createMatrix(){
-    size_t rows, columns;
+    int rows, columns;
     Matrix matrix;
     printf("Enter the number of rows: ");
-    if (!scanf("%d", &rows))
+    if (!scanf("%d", &rows) || rows <= 0)
         throwException("Invalid rows type", 0);
     printf("Enter the number of columns: ");
-    if (!scanf("%d", &columns))
+    if (!scanf("%d", &columns) || columns <= 0)
         throwException("Invalid columns type", 0);
     matrix.matrix = calloc(rows, sizeof(int *));
     if (matrix.matrix == NULL)
@@ -81,20 +82,23 @@ Matrix userInput(){
 Matrix getFilledMatrix(){
     int option;
     Matrix matrix;
-    printf("Enter 1 to input your matrix\nEnter 2 to generate random matrix\n");
-    if (!scanf("%d", &option))
-        throwException("Invalid option type", 0);
-    switch (option){
-        case UserInput:
-            matrix = userInput();
-            break;
-        case Random:
-            matrix = randomFill();
-            break;
-        default:
-            throwException("Invalid option", 0);
+    do {
+        printf("Enter 1 to input your matrix\nEnter 2 to generate random matrix\n");
+        if (!scanf("%d", &option)){
+            while (getchar() != '\n');
+            continue;
+        }
+        switch (option){
+            case UserInput:
+                matrix = userInput();
+                break;
+            case Random:
+                matrix = randomFill();
+                break;
+        }
+        return matrix;
     }
-    return matrix;
+    while (true);
 }
 
 
