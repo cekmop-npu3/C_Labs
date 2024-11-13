@@ -16,12 +16,14 @@ typedef enum {
 } Input;
 
 
-void handleIntInput(int *num, char *msg){
+void handleIntInput(int *num, char *msg, bool isUnsigned){
     do {
         if (msg != NULL)
             printf("%s", msg);
         if (scanf("%d", num)){
             while (getchar() != '\n');
+            if (isUnsigned && !(*num >= 0))
+                continue;
             break;
         }
         while (getchar() != '\n');
@@ -42,7 +44,7 @@ Array *initIntArray(int size){
 
 void userInput(Array *array){
     for (int i = 0; i < array->size; i++)
-        handleIntInput(&array->sequence[i], "Enter the element: ");
+        handleIntInput(&array->sequence[i], "Enter the element: ", false);
 }
 
 void randomInput(Array *array){
@@ -55,11 +57,11 @@ void randomInput(Array *array){
 Array *getFilledIntArray(){
     Input choice;
     int size;
-    handleIntInput(&size, "Enter the size of an array: ");
+    handleIntInput(&size, "Enter the size of an array: ", true);
     Array *array = initIntArray(size);
     array->size = size;
     start:
-    handleIntInput((int *) &choice, "Enter 0 to fill the array manually, 1 to fill it randomly: ");
+    handleIntInput((int *) &choice, "Enter 0 to fill the array manually, 1 to fill it randomly: ", false);
     switch ((Input) choice){
         case UserInput:
             userInput(array);
