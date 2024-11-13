@@ -1,86 +1,122 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
 #include <stdbool.h>
-
-
-void throwException(char message[], size_t count, ...){
-    if (count > 0){
-        va_list args;
-        va_start(args, count);
-        for (int i = 0; i < count; i++){
-            void *mem = va_arg(args, void*);
-            free(mem);
-        }
-        va_end(args);
-    }
-    printf("%s\n", message);
-    exit(EXIT_FAILURE);
-}
-
-
-void printArray(float array[], size_t *size){
-    for (int i = 0; i < *size; i++)
-        printf("%.1f ", array[i]);
-}
+#include <time.h>
 
 
 typedef struct {
-    float *array;
-    size_t size;
+    int *sequence;
+    int size;
 } Array;
 
 
-bool inArray(float array[], size_t *size, float *elem){
-    for (int i = 0; i < *size; i++)
-        if (*elem == array[i])
-            return true;
-    return false;
-}
+typedef enum {
+    UserInput,
+    RandomInput
+} Input;
 
 
-Array set(float array[], size_t *size){
-    float *tempArray = calloc(*size, sizeof(float));
-    int index = 0;
-    for (int i = 0; i < *size; i++){
-        if (!inArray(tempArray, size, &(array[i]))){
-            tempArray[index] = array[i];
-            index++;
+void handleIntInput(int *num, char *msg){
+    do {
+        if (msg != NULL)
+            printf("%s", msg);
+        if (scanf("%d", num)){
+            while (getchar() != '\n');
+            break;
         }
+        while (getchar() != '\n');
     }
-    Array result;
-    result.array = calloc(index, sizeof(float));
-    memcpy(result.array, tempArray, index * sizeof(float));
-    result.size = index;
-    free(tempArray);
-    return result;
+    while (true);
 }
 
 
-float *scanInput(size_t *size){
-    printf("Enter the size of an array: ");
-    if (!scanf("%zu", size))
-        throwException("Incorrect size type", 0);
-    float *array = calloc(*size, sizeof(float));
-    if (array == NULL)
-        throwException("Cannot allocate memory", 0);
-    printf("Enter the array elements: ");
-    for (int i = 0; i < *size; i++){
-        if (!scanf("%f", &array[i]))
-            throwException("Wrong element type", 1, array);
+Array *initIntArray(int size){
+    Array *array = malloc(sizeof(Array));
+    if (array != NULL){
+        array->sequence = malloc(sizeof(int) * size);
+        array->size = 0;
     }
     return array;
 }
 
 
+void userInput(Array *array){
+    for (int i = 0; i < array->size; i++)
+        handleIntInput(&array->sequence[i], "Enter the element: ");
+}
+
+void randomInput(Array *array){
+    srand(time(NULL));
+    for (int i = 0; i < array->size; i++)
+        array->sequence[i] = rand() % 100;
+}
+
+
+Array *getFilledIntArray(){
+    Input choice;
+    int size;
+    handleIntInput(&size, "Enter the size of an array: ");
+    Array *array = initIntArray(size);
+    array->size = size;
+    start:
+    handleIntInput((int *) &choice, "Enter 0 to fill the array manually, 1 to fill it randomly: ");
+    switch ((Input) choice){
+        case UserInput:
+            userInput(array);
+            break;
+        case RandomInput:
+            randomInput(array);
+            break;
+        default:
+            goto start;
+    }
+    return array;
+}
+
+
+void printArray(Array *array){
+    if (array != NULL && array->sequence != NULL && array->size > 0)
+        for (int i = 0; i < array->size; i++)
+            printf("%d ", array->sequence[i]);
+    printf("\n");
+}
+
+
+void freeArray(Array *array){
+    if (array != NULL){
+        if (array->sequence != NULL)
+            free(array->sequence);
+        free(array);
+    }
+}
+
+
+bool inArray(Array *array, int elem){
+    for (int i = 0; i < array->size; i++)
+        if (elem == array->sequence[i])
+            return true;
+    return false;
+}
+
+
+Array *set(Array *array){
+    Array *tempArray = initIntArray(array->size);
+    for (int i = 0; i < array->size; i++){
+        if (!inArray(tempArray, array->sequence[i])){
+            tempArray->sequence[tempArray->size] = array->sequence[i];
+            tempArray->size++;
+        }
+    }
+    freeArray(array);
+    return tempArray;
+}
+
+
 int main(){
-    size_t size;
-    float *array;
-    array = scanInput(&size);
-    Array result = set(array, &size);
-    free(array);
-    printArray(result.array, &result.size);
-    free(result.array);
+    Array *array = getFilledIntArray();
+    printArray(array);
+    Array *setArray = set(array);
+    printArray(setArray);
     return EXIT_SUCCESS;
 }
+

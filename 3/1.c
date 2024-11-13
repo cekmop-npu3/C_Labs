@@ -1,66 +1,126 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
+#include <stdbool.h>
+#include <time.h>
 
 
-void throwException(char message[], size_t count, ...){
-    if (count > 0){
-        va_list args;
-        va_start(args, count);
-        for (int i = 0; i < count; i++){
-            void *mem = va_arg(args, void*);
-            free(mem);
-        }
-        va_end(args);
-    }
-    printf("%s\n", message);
-    exit(EXIT_FAILURE);
-}
+typedef struct {
+    int *sequence;
+    int size;
+} Array;
 
 
-float max(float array[], size_t *size){
-    float maxFloat = array[0];
-    for (int i = 1; i < *size; i++){
-        if (maxFloat < array[i])
-            maxFloat = array[i];
-    }
-    return maxFloat;
-}
+typedef enum {
+    UserInput,
+    RandomInput
+} Input;
 
 
-float positiveNumSum(float array[], size_t *size){
-    int count = 0;
-    float sum = 0.0;
-    for (int i = 1; i < *size - 1; i++){
-        if (count < 2){
-            if (array[i] > 0){
-                sum += array[i - 1] + array[i + 1];
-                count++;
-            }  
-        }
-        else {
+void handleIntInput(int *num, char *msg){
+    do {
+        if (msg != NULL)
+            printf("%s", msg);
+        if (scanf("%d", num)){
+            while (getchar() != '\n');
             break;
         }
+        while (getchar() != '\n');
     }
-    return sum;
+    while (true);
+}
+
+
+Array *initIntArray(int size){
+    Array *array = malloc(sizeof(Array));
+    if (array != NULL){
+        array->sequence = malloc(sizeof(int) * size);
+        array->size = 0;
+    }
+    return array;
+}
+
+
+void userInput(Array *array){
+    for (int i = 0; i < array->size; i++)
+        handleIntInput(&array->sequence[i], "Enter the element: ");
+}
+
+void randomInput(Array *array){
+    srand(time(NULL));
+    for (int i = 0; i < array->size; i++)
+        array->sequence[i] = rand() % 100;
+}
+
+
+Array *getFilledIntArray(){
+    Input choice;
+    int size;
+    handleIntInput(&size, "Enter the size of an array: ");
+    Array *array = initIntArray(size);
+    array->size = size;
+    start:
+    handleIntInput((int *) &choice, "Enter 0 to fill the array manually, 1 to fill it randomly: ");
+    switch ((Input) choice){
+        case UserInput:
+            userInput(array);
+            break;
+        case RandomInput:
+            randomInput(array);
+            break;
+        default:
+            goto start;
+    }
+    return array;
+}
+
+
+void printArray(Array *array){
+    if (array != NULL && array->sequence != NULL && array->size > 0)
+        for (int i = 0; i < array->size; i++)
+            printf("%d ", array->sequence[i]);
+    printf("\n");
+}
+
+
+void freeArray(Array *array){
+    if (array != NULL){
+        if (array->sequence != NULL)
+            free(array->sequence);
+        free(array);
+    }
+}
+
+
+int max(Array *array){
+    int maxElem = array->sequence[0];
+    for (int i = 1; i < array->size; i++)
+        if (array->sequence[i] > maxElem)
+            maxElem = array->sequence[i];
+    return maxElem;
+}
+
+
+int sumBetween2Positive(Array *array){
+    int positive[4] = {1};
+    for (int i = 0; i < array->size; i++)
+        if (array->sequence[i] > 0){
+            positive[positive[0]] = i;
+            positive[0]++;
+            if (positive[0] == 3)
+                break;
+        }
+        else if (positive[0] == 2)
+            positive[3] += array->sequence[i];
+    return positive[0] == 3 ? positive[3] : 0;
 }
 
 
 int main(){
-    size_t size;
-    float *array;
-    printf("Enter the size of an array: ");
-    if (!scanf("%zu", &size))
-        throwException("Incorrect size type", 0);
-    array = calloc(size, sizeof(float));
-    printf("Enter the array elements: ");
-    for (int i = 0; i < size; i++){
-        if (!scanf("%f", &array[i]))
-            throwException("Wrong element type", 1, array);
-    }
-    printf("Max element of an array: %.1f\n", max(array, &size));
-    printf("Sum of first two positive numbers: %.1f\n", positiveNumSum(array, &size));
-    free(array);
+    Array *array = getFilledIntArray();
+    printArray(array);
+    printf("Max elem is %d\n", max(array));
+    printf("Sum between first two positive elements: %d", sumBetween2Positive(array));
+    freeArray(array);
     return EXIT_SUCCESS;
 }
 
