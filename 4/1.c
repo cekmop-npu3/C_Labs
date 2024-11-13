@@ -37,12 +37,24 @@ void throwException(char message[], size_t count, ...){
 Matrix createMatrix(){
     int rows, columns;
     Matrix matrix;
-    printf("Enter the number of rows: ");
-    if (!scanf("%d", &rows) || rows <= 0)
-        throwException("Invalid rows type", 0);
-    printf("Enter the number of columns: ");
-    if (!scanf("%d", &columns) || columns <= 0)
-        throwException("Invalid columns type", 0);
+    do {
+        printf("Enter the number of rows: ");
+        if (!scanf("%d", &rows) || rows <= 0){
+            while (getchar() != '\n');
+            continue;
+        }
+        break;
+    }
+    while (true);
+    do {
+        printf("Enter the number of columns: ");
+        if (!scanf("%d", &columns) || columns <= 0){
+            while (getchar() != '\n');
+            continue;
+        }
+        break;
+    }
+    while (true);
     matrix.matrix = calloc(rows, sizeof(int *));
     if (matrix.matrix == NULL)
         throwException("Cannot allocate memory", 0);
@@ -62,7 +74,7 @@ Matrix randomFill(){
     Matrix matrix = createMatrix();
     for (int i = 0; i < matrix.rows; i++)
         for (int j = 0; j < matrix.columns; j++)
-            matrix.matrix[i][j] = rand();
+            matrix.matrix[i][j] = rand() % 101;
     return matrix;
 }
 
@@ -70,10 +82,13 @@ Matrix randomFill(){
 Matrix userInput(){
     Matrix matrix = createMatrix();
     for (int i = 0; i < matrix.rows; i++){
+        start:
         printf("Enter the %d row: ", i);
         for (int j = 0; j < matrix.columns; j++)
-            if (!scanf("%d", &matrix.matrix[i][j]))
-                throwException("Invalid input type", 1, matrix.matrix);
+            if (!scanf("%d", &matrix.matrix[i][j])){
+                while (getchar() != '\n');
+                goto start;
+            }
     }
     return matrix;
 }
@@ -122,8 +137,18 @@ int nonZeroCols(Matrix matrix){
 }
 
 
+void printMatrix(Matrix *matrix){
+    for (int i = 0; i < matrix->rows; i++){
+        for (int j = 0; j < matrix->columns; j++)
+            printf("%d ", matrix->matrix[i][j]);
+        printf("\n");
+    }
+}
+
+
 int main(){
     Matrix matrix = getFilledMatrix();
+    printMatrix(&matrix);
     printf("Non-zero columns: %d", nonZeroCols(matrix));
     freeMatrix(matrix);
     return EXIT_SUCCESS;
