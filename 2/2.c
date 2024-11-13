@@ -1,14 +1,18 @@
 #include <stdio.h>
-#include <limits.h>
-#include <assert.h>
 #include <stdbool.h>
 
 
-bool scanNum(char name[], int *num){
-    printf("Enter the %s number: ", name);
-    int check = scanf("%d", num);
-    assert(*num < INT_MAX && *num > INT_MIN);
-    return check;
+void scanNum(char name[], int *num){
+    do {
+        printf("Enter the %s number: ", name);
+        if (!scanf("%d", num)){
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n');
+        break;
+    }
+    while (true);
 }
 
 
@@ -24,8 +28,8 @@ double calculateSum(int *num1, int *num2){
 int main(){
     int num1, num2;
 
-    if (!scanNum("first", &num1) || !scanNum("second", &num2))
-        assert(1 == 0);
+    scanNum("first", &num1);
+    scanNum("second", &num2);
     printf("%f", calculateSum(&num1, &num2));
 }
 
