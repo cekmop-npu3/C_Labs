@@ -1,47 +1,51 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include <assert.h>
 
 
-int getFib(int n){
-    if (n <= 1)
-        return n;
-    return getFib(n - 1) + getFib(n - 2);
+int getFib(int n) {
+    if (n < 1)
+        return -1;
+    if (n == 1 || n == 2)
+        return 1;
+    else
+        return getFib(n - 1) + getFib(n - 2);
 }
 
 
-int getSequenceNum(int *num){
-    int seqNum = 0;
+int getSeqNum(int num){
+    int seqNum = 1;
     while (true){
-        int fib = getFib(seqNum);
-        if (*num < fib){
+        if (getFib(seqNum) == num)
+            break;
+        else if (getFib(seqNum) > num){
             seqNum = -1;
             break;
         }
-        else if (*num != fib){
-            seqNum += 1;
-            continue;
-        }
-        break;
+        seqNum++;
     }
-    return seqNum + 1;
-    
+    return seqNum;
 }
 
 
 int main(){
     int num;
+    do {
+        printf("Enter the number from Fibonacci sequence: ");
+        if (!scanf("%d", &num)){
+            while (getchar() != '\n');
+            continue;
+        }
+        while (getchar() != '\n');
+        break;
 
-    printf("Enter the number from Fibonacci sequence: ");
+    }
+    while (true);
 
-    if (!scanf("%d", &num))
-        assert(1 == 0);
-
-    int seqNum = getSequenceNum(&num);
-    
-    if (seqNum != -1)
-        printf("Sequence number is %d", seqNum);
-    else
+    int seqNum = getSeqNum(num);
+    if (seqNum == -1)
         printf("%d is not a number from Fibonacci sequence", num);
+    else 
+        printf("Sequence number is %d", seqNum);
+
     return 0;
 }
