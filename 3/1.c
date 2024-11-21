@@ -2,34 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <stdarg.h>
+#include <string.h>
 
-
-typedef struct {
-    int *sequence;
-    int size;
-} Array;
-
-
-typedef enum {
-    UserInput,
-    RandomInput
-} Input;
-
-
-void handleIntInput(int *num, char *msg, bool isUnsigned){
-    do {
-        if (msg != NULL)
-            printf("%s", msg);
-        if (scanf("%d", num)){
-            while (getchar() != '\n');
-            if (isUnsigned && !(*num >= 0))
-                continue;
-            break;
-        }
-        while (getchar() != '\n');
-    }
-    while (true);
-}
+#include "utils/inputHandlers.h"
 
 
 Array *initIntArray(int size){
@@ -44,7 +20,7 @@ Array *initIntArray(int size){
 
 void userInput(Array *array){
     for (int i = 0; i < array->size; i++)
-        handleIntInput(&array->sequence[i], "Enter the element: ", false);
+        handleIntInput(&array->sequence[i], NULL, "Enter the element [%d]: ", i);
 }
 
 void randomInput(Array *array){
@@ -57,11 +33,13 @@ void randomInput(Array *array){
 Array *getFilledIntArray(){
     Input choice;
     int size;
-    handleIntInput(&size, "Enter the size of an array: ", true);
+    int arraySizeRange[2] = {1, MaxArraySize};
+    int choiceRange[2] = {0, 1};
+    handleIntInput(&size, arraySizeRange, "Enter the size of an array: ");
     Array *array = initIntArray(size);
     array->size = size;
     start:
-    handleIntInput((int *) &choice, "Enter 0 to fill the array manually, 1 to fill it randomly: ", false);
+    handleIntInput((int *) &choice, choiceRange, "Enter 0 to fill the array manually, 1 to fill it randomly: ");
     switch ((Input) choice){
         case UserInput:
             userInput(array);
