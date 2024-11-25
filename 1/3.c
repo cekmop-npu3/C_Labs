@@ -2,19 +2,19 @@
 #include <stdbool.h>
 
 
-bool isArithmeticProgression(int *a, int *b, int *c){
+bool isArithmeticProgression(float *a, float *b, float *c){
     return (*b == (*a + *c) / 2);
 }
 
 
-void scanNums(char name[], int *num){
+void scanNums(char name[], float *num){
     printf("Enter the %s number: ", name);
-    scanf("%d", num);
+    scanf("%f", num);
 }
 
 
 int main(){
-    int num1, num2, num3;
+    float num1, num2, num3;
 
     scanNums("first", &num1);
     scanNums("second", &num2);
