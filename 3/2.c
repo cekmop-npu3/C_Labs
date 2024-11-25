@@ -87,7 +87,6 @@ Array *set(Array *array){
             tempArray->size++;
         }
     }
-    freeArray(array);
     return tempArray;
 }
 
@@ -97,6 +96,7 @@ int main(){
     printArray(array);
     Array *setArray = set(array);
     printArray(setArray);
+    freeArray(array);
     return EXIT_SUCCESS;
 }
 

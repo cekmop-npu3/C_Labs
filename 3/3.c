@@ -115,7 +115,6 @@ Counter *count(Array *array){
             counter->counters[counter->size] = count;
             counter->size++;
         }
-    freeArray(array);
     return counter;
 }
 
@@ -125,6 +124,7 @@ int main(){
     printArray(array);
     Counter *counter = count(array);
     printCounter(counter);
+    freeArray(array);
     freeCounter(counter);
     return EXIT_SUCCESS;
 }
