@@ -4,7 +4,7 @@
 
 
 bool onCondition(int *num, int *digit1, int *digit2){
-    return (pow(*digit1, 2) + pow(*digit2, 2) + 1) == 3 * (*digit1) * (*digit2) && (*num / (*digit1 + *digit2)) == 7 && (*num % (*digit1 + *digit2)) == 6 ? true : false; 
+    return (*digit1 * (*digit1) + *digit2 * (*digit2) + 1) == 3 * (*digit1) * (*digit2) && (*num / (*digit1 + *digit2)) == 7 && (*num % (*digit1 + *digit2)) == 6 ? true : false; 
 }
 
 
