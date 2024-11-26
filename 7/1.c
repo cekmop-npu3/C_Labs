@@ -90,15 +90,19 @@ Str *getStr(char *message, ...){
 }
 
 
+Word *getTheLongestWord(Str *str){
+    Word *longest = str->words[0];
+    for (int i = 0; i < str->len; i++)
+        if (str->words[i]->size > longest->size)
+            longest = str->words[i];
+    return longest;
+}
+
+
 int main(){
     Str *str = getStr("Enter string: ");
     printf("\n");
-    for (int i = 0; i < str->len; i++)
-        printf("%s ", str->words[i]->value);
-    printf("\n");
-    for (int i = 0; i < str->len; i++)
-        printf("%d ", str->words[i]->size);
-    freeStr(str);
+    printf("The longest word is: %s\n", getTheLongestWord(str)->value);
     return EXIT_SUCCESS;
 }
 
