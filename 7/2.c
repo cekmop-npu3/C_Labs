@@ -51,6 +51,8 @@ Str *getStr(char *message, ...){
 
     while ((c = getchar()) != '\n' && c != EOF){
         putchar(c);
+        str->raw = realloc(str->raw, ++str->size * sizeof(char));
+        str->raw[str->size - 1] = c;
         c = (c == '\t' ? ' ' : c);
         if (c != ' '){
             if (splited){
@@ -69,8 +71,6 @@ Str *getStr(char *message, ...){
         }
         else
             splited = true;
-        str->raw = realloc(str->raw, ++str->size * sizeof(char));
-        str->raw[str->size - 1] = c;
     }
     str->raw = realloc(str->raw, str->size + 1); 
     str->raw[str->size] = '\0';
@@ -82,25 +82,28 @@ Str *getStr(char *message, ...){
 }
 
 
-void removeFromWords(Str *str, Word *word){
-    int newArrIndex = 0;
-    bool removed = false;
-    Word **words = malloc(--str->len * sizeof(Word *));
-    for (int i = 0; i < str->len + 1; i++){
-        if ((str->words[i]->value != word->value) || removed){
-            words[newArrIndex] = str->words[i];
-            newArrIndex++;
-            continue;
-        }
-        removed = true;
-    }
-    for (int i = 0; i < str->len + 1; i++){
-        free(str->words[i]->value);
-        free(str->words[i]);
-    }
-    free(str->words);
-    str->words = words;
-}
+// void removeFromWords(Str *str, Word *word){
+//     int newArrIndex = 0;
+//     bool removed = false;
+//     int j = 0;
+//     bool start = false;
+//     for (int i = 0; i < str->len; i++){
+//         if (word->size <= str->words[i])
+//             for (j; j < word->size; j++)
+//                 if (word->value[j] == str->words[j]->value)
+//                     s
+//         printf("%s %s\n", str->words[i]->value, word->value);
+//         if ((str->words[i]->value != word->value) || removed){
+//             str->words[newArrIndex] = str->words[i];
+//             newArrIndex++;
+//             continue;
+//         }
+//         printf("was removed\n");
+//         removed = true;
+//     }
+//     if (removed)
+//         str->words = realloc(str->words, --str->len);
+// }
 
 
 void removeFromRaw(Str *str, Word *word){
@@ -121,7 +124,7 @@ void removeFromRaw(Str *str, Word *word){
     if (startIndex != -1){
         for (int i = endIndex; i < str->size; i++)
             str->raw[i - word->size] = str->raw[i];
-        str->raw = realloc(str->raw, str->size -= word->size + 1);
+        str->raw = realloc(str->raw, (str->size -= word->size) + 1);
         str->raw[str->size] = '\0';
     }
 }
@@ -132,6 +135,12 @@ int main(){
     printf("\n");
     Str *str2 = getStr("Enter the second string: ");
     printf("\n");
+    //removeFromWords func is not working properly
+    removeFromWords(str, str2->words[0]);
+    //removeFromRaw(str, str2->words[0]);
+    for (int i = 0; i < str->len; i++)
+        printf("{%s %d}", str->words[i]->value, str->words[i]->size);
+    //printf("%s", str->raw);
     return EXIT_SUCCESS;
 }
 
