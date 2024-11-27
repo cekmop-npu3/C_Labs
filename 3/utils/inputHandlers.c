@@ -12,21 +12,39 @@ void handleIntInput(int *num, int range[2], char *message, ...){
         printf("%s", tmpString);
         strcat(error, tmpString);
     }
-    do {
-        if (scanf("%d", num)){
-            if (range != NULL){
-                if (*num >= range[0] && *num <= range[1]){
-                    while (getchar() != '\n');
-                    break;
-                }
-            }
-            else {
-                while (getchar() != '\n');
-                break;
-            }
+
+    char c;
+    start:
+    char *res = NULL;
+    int size = 0;
+    int sign = 1;
+
+    while (true){
+        c = getchar();
+        if (c == '\n' && size)
+            break;
+        if (c == '-' && sign == 1){
+            sign = -1;
+            continue;
         }
-        printf("%s", error);
+        if (isdigit(c)){
+            res = realloc(res, ++size * sizeof(char));
+            res[size - 1] = c;
+            continue;
+        }
+        ungetc(c, stdin);
         while (getchar() != '\n');
+        free(res);
+        printf("%s", error);
+        goto start;
     }
-    while (true);
+    for (int i = size; i > 0; i--)
+        *num += pow(10, i - 1) * (res[size - i] - '0');
+    free(res);
+    *num *= sign;
+    if (range != NULL && !(*num >= range[0] && *num <= range[1])){
+        printf("%s", error);
+        *num = 0;
+        goto start;
+    }
 }
