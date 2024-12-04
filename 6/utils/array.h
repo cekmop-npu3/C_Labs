@@ -4,6 +4,8 @@
 #include "inputHandlers.h"
 #include "types.h"
 
+#define MaxArraySize 64
+
 
 Array *initIntArray(int size);
 

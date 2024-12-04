@@ -15,6 +15,7 @@ void handleIntInput(int *num, int range[2], char *message, ...){
 
     char c;
     start:
+    *num = 0;
     char *res = NULL;
     int size = 0;
     int sign = 1;
