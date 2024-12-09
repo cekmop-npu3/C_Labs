@@ -22,3 +22,9 @@ typedef struct {
     Count *counters;
     int size;
 } Counter;
+
+
+typedef struct {
+    Array **matrix;
+    int size;
+} Matrix;

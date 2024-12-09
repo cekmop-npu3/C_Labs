@@ -17,7 +17,6 @@ void userInput(Array *array){
 }
 
 void randomInput(Array *array){
-    srand(time(NULL));
     for (int i = 0; i < array->size; i++)
         array->sequence[i] = rand() % 100;
 }
