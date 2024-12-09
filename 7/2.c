@@ -82,30 +82,6 @@ Str *getStr(char *message, ...){
 }
 
 
-// void removeFromWords(Str *str, Word *word){
-//     int newArrIndex = 0;
-//     bool removed = false;
-//     int j = 0;
-//     bool start = false;
-//     for (int i = 0; i < str->len; i++){
-//         if (word->size <= str->words[i])
-//             for (j; j < word->size; j++)
-//                 if (word->value[j] == str->words[j]->value)
-//                     s
-//         printf("%s %s\n", str->words[i]->value, word->value);
-//         if ((str->words[i]->value != word->value) || removed){
-//             str->words[newArrIndex] = str->words[i];
-//             newArrIndex++;
-//             continue;
-//         }
-//         printf("was removed\n");
-//         removed = true;
-//     }
-//     if (removed)
-//         str->words = realloc(str->words, --str->len);
-// }
-
-
 void removeFromRaw(Str *str, Word *word){
     int startIndex = -1;
     int endIndex;
@@ -135,12 +111,8 @@ int main(){
     printf("\n");
     Str *str2 = getStr("Enter the second string: ");
     printf("\n");
-    //removeFromWords func is not working properly
-    removeFromWords(str, str2->words[0]);
-    //removeFromRaw(str, str2->words[0]);
-    for (int i = 0; i < str->len; i++)
-        printf("{%s %d}", str->words[i]->value, str->words[i]->size);
-    //printf("%s", str->raw);
+    removeFromRaw(str, str2->words[0]);
+    printf("%s", str->raw);
     return EXIT_SUCCESS;
 }
 
