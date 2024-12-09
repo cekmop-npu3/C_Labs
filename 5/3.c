@@ -117,28 +117,28 @@ void printMatrix(Matrix *matrix){
 
 
 Array *getLongestPositiveSeq(Matrix *matrix){
-    Array *main = malloc(sizeof(Array));
-    main->sequence = NULL;
-    main->size = 0;
-    Array *temp = malloc(sizeof(Array));
-    temp->sequence = NULL;
-    temp->size = 0;
+    Array *main = initIntArray(0);
+    Array *temp = initIntArray(0);
     for (int i = 0; i < matrix->size; i++)
         for (int j = 0; j < matrix->matrix[i]->size; j++){
             if (matrix->matrix[i]->sequence[j] >= 0){
+                //printf("Adding to temp array: %d\n", matrix->matrix[i]->sequence[j]);
                 temp->sequence = realloc(temp->sequence, (temp->size + 1) * sizeof(int));
                 temp->sequence[temp->size++] = matrix->matrix[i]->sequence[j];
             }
             else {
                 if (temp->sequence != NULL && temp->size > main->size){
-                    main->sequence = realloc(main->sequence, sizeof(int) * temp->size);
+                    main->sequence = realloc(temp->sequence, sizeof(int) * temp->size);
+                    main->size = temp->size;
                 }
                 temp->sequence = NULL;
                 temp->size = 0;
             }
         }
-    if (temp->sequence != NULL && temp->size > main->size)
+    if (temp->sequence != NULL && temp->size > main->size){
         main->sequence = realloc(temp->sequence, sizeof(int) * temp->size);
+        main->size = temp->size;
+    }
     free(temp);
     return main;
 }
@@ -147,6 +147,7 @@ Array *getLongestPositiveSeq(Matrix *matrix){
 int main(){
     Matrix *matrix = getFilledIntMatrix();
     printMatrix(matrix);
+    printf("\n");
     Array *array = getLongestPositiveSeq(matrix);
     printArray(array);
     freeArray(array);
