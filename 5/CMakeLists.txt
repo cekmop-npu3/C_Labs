@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.10)
+project(main)
+add_library(lib utils/inputHandlers.c)
+set(exe_name 2)
+add_executable(${exe_name} ${exe_name}.c)
+target_link_libraries(${exe_name} lib)
