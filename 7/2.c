@@ -111,8 +111,11 @@ int main(){
     printf("\n");
     Str *str2 = getStr("Enter the second string: ");
     printf("\n");
-    removeFromRaw(str, str2->words[0]);
+    if (str2->words != NULL)
+        removeFromRaw(str, str2->words[0]);
     printf("%s", str->raw);
+    freeStr(str);
+    free(str2);
     return EXIT_SUCCESS;
 }
 
