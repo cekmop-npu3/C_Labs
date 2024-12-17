@@ -103,6 +103,7 @@ int main(){
     Str *str = getStr("Enter string: ");
     printf("\n");
     printf("The longest word is: %s\n", getTheLongestWord(str)->value);
+    freeStr(str);
     return EXIT_SUCCESS;
 }
 
