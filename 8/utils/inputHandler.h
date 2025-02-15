@@ -33,5 +33,3 @@ static int onIntType(char *literal, int size);
 static int addChar(char **dest, int size, char c);
 
 Elem *input(char *message, ...);
-
-Elem *filterInput(int range[2]);
