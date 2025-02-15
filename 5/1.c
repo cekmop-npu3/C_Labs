@@ -18,11 +18,6 @@ Array *initIntArray(int size){
 }
 
 
-void userInput(Array *array){
-    for (int i = 0; i < array->size; i++)
-        handleIntInput(&array->sequence[i], NULL, "Enter the element [%d]: ", i);
-}
-
 void randomInput(Array *array){
     srand(time(NULL));
     for (int i = 0; i < array->size; i++)
@@ -31,7 +26,6 @@ void randomInput(Array *array){
 
 
 Array *getFilledIntArray(){
-    Input choice;
     int size;
     int arraySizeRange[2] = {1, MaxArraySize};
     int choiceRange[2] = {0, 1};

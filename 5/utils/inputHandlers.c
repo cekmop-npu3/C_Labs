@@ -14,17 +14,13 @@ void handleIntInput(int *num, int range[2], char *message, ...){
     }
 
     char c;
-    start:
     *num = 0;
     char *res = NULL;
     int size = 0;
     int sign = 1;
 
-    while (true){
-        c = getchar();
-        if (c == '\n' && size)
-            break;
-        if (c == '-' && sign == 1){
+    while (!((c = getchar()) == '\n' && size)){
+        if (c == '-' && sign == 1 && !size){
             sign = -1;
             continue;
         }
@@ -37,7 +33,10 @@ void handleIntInput(int *num, int range[2], char *message, ...){
         while (getchar() != '\n');
         free(res);
         printf("%s", error);
-        goto start;
+        *num = 0;
+        char *res = NULL;
+        int size = 0;
+        int sign = 1;
     }
     for (int i = size; i > 0; i--)
         *num += pow(10, i - 1) * (res[size - i] - '0');
@@ -45,7 +44,6 @@ void handleIntInput(int *num, int range[2], char *message, ...){
     *num *= sign;
     if (range != NULL && !(*num >= range[0] && *num <= range[1])){
         printf("%s", error);
-        *num = 0;
-        goto start;
+        handleIntInput(num, range, message);
     }
 }

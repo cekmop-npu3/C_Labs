@@ -96,18 +96,10 @@ Matrix *getFilledIntMatrix(){
     handleIntInput(&size, matrixSizeRange, "Enter the number of rows: ");
     Matrix *matrix = initIntMatrix(size);
     matrix->size = size;
-    start:
-    handleIntInput((int *) &choice, choiceRange, "Enter 0 to fill the matrix manually, 1 to fill it randomly: ");
-    switch ((Input) choice){
-        case UserInput:
-            matrixUserInput(matrix);
-            break;
-        case RandomInput:
-            matrixRandomInput(matrix);
-            break;
-        default:
-            goto start;
-    }
+    if ((Input) choice == UserInput)
+        matrixUserInput(matrix);
+    else 
+        matrixRandomInput(matrix);
     return matrix;
 }
 
