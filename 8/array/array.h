@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../utils/inputHandler.h"
+#include <inputHandler.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
