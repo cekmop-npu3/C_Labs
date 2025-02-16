@@ -19,7 +19,7 @@ Steps to build and run the project
 
     cmake --build .
 
-4. Run main file passing name of the file as a parameter
+4. Run main file passing name of the binary file as a parameter
 
 .. code:: sh
     
