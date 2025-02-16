@@ -22,6 +22,8 @@ int main(int argc, char *argv[]){
     Array *array = initArray();
     userInput(array);
     printArray(array);
-    free(array);
+    freeArray(array);
+    FILE *file = fopen(filename, "w+");
+    fclose(file);
     return EXIT_SUCCESS;
 }
