@@ -35,3 +35,33 @@ void fileInput(char *filename){
     fclose(file);
 }
 
+
+void fileSwap(FILE *file, int index, int swapIndex){
+    int elem, swapElem;
+    bool toWrite = false;
+    bool exit = false;
+    while (!exit){
+        fseek(file, index * sizeof(int), SEEK_SET);
+        toWrite ? fwrite(&swapElem, sizeof(int), 1, file) : fread(&elem, sizeof(int), 1, file);
+        fseek(file, swapIndex * sizeof(int), SEEK_SET);
+        toWrite ? (fwrite(&elem, sizeof(int), 1, file), exit = true) : (fread(&swapElem, sizeof(int), 1, file), toWrite = true);
+    }
+}
+
+
+void shiftFile(FILE *file, ShiftType type){
+    int elem, prev;
+    fseek(file, 0, SEEK_END);
+    int len = ftell(file) / sizeof(int);
+    int index = (type ? len - 1 : 0);
+    fseek(file, (type ? 0 : len - 1) * sizeof(int), SEEK_SET);
+    fread(&prev, sizeof(int), 1, file);
+    for (index; (type ? index >= 0 : index < len); (index += (1 - 2 * type))){
+        fseek(file, index * sizeof(int), SEEK_SET);
+        fread(&elem, sizeof(int), 1, file);
+        fseek(file, index * sizeof(int), SEEK_SET);
+        fwrite(&prev, sizeof(int), 1, file);
+        prev = elem;
+    }
+}
+

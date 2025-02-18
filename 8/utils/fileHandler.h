@@ -5,8 +5,17 @@
 #include <stdio.h>
 #include <stdint.h>
 
+typedef enum {
+    shiftRight,
+    shiftLeft
+} ShiftType;
+
 char *setFilename(int argc, char *argv[]);
 
 void fileInput(char *filename);
+
+void fileSwap(FILE *file, int index, int swapIndex);
+
+void shiftFile(FILE *file, ShiftType type);
 
 #endif
