@@ -16,6 +16,6 @@ void fileInput(char *filename);
 
 void fileSwap(FILE *file, int index, int swapIndex);
 
-void shiftFile(FILE *file, ShiftType type);
+void shiftFile(FILE *file, ShiftType type, int bound[2]);
 
 #endif

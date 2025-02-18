@@ -49,14 +49,14 @@ void fileSwap(FILE *file, int index, int swapIndex){
 }
 
 
-void shiftFile(FILE *file, ShiftType type){
+void shiftFile(FILE *file, ShiftType type, int bound[2]){
     int elem, prev;
     fseek(file, 0, SEEK_END);
-    int len = ftell(file) / sizeof(int);
-    int index = (type ? len - 1 : 0);
-    fseek(file, (type ? 0 : len - 1) * sizeof(int), SEEK_SET);
+    int indexes[2] = {bound == NULL ? 0 : bound[0], bound == NULL ? ftell(file) / sizeof(int) - 1 : bound[1]};
+    int index = (type ? indexes[1] : indexes[0]);
+    fseek(file, (type ? indexes[0] : indexes[1]) * sizeof(int), SEEK_SET);
     fread(&prev, sizeof(int), 1, file);
-    for (index; (type ? index >= 0 : index < len); (index += (1 - 2 * type))){
+    for (index; (type ? index >= indexes[0] : index < indexes[1] + 1); (index += (1 - 2 * type))){
         fseek(file, index * sizeof(int), SEEK_SET);
         fread(&elem, sizeof(int), 1, file);
         fseek(file, index * sizeof(int), SEEK_SET);
