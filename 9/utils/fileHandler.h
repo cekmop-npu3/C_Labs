@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 
 #define MaxStrSize 100
@@ -15,5 +16,9 @@ typedef enum {
 char *setFilename(int argc, char *argv[]);
 
 void fileInput(char *filename);
+
+void fileSwap(FILE *file, int index, int swapIndex);
+
+void shiftFile(FILE *file, ShiftType type, int bound[2]);
 
 #endif
