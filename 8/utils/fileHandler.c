@@ -1,4 +1,4 @@
-#include <fileHandler.h>
+#include "fileHandler.h"
 
 
 char *setFilename(int argc, char *argv[]){
@@ -47,21 +47,3 @@ void fileSwap(FILE *file, int index, int swapIndex){
         toWrite ? (fwrite(&elem, sizeof(int), 1, file), exit = true) : (fread(&swapElem, sizeof(int), 1, file), toWrite = true);
     }
 }
-
-
-void shiftFile(FILE *file, ShiftType type, int bound[2]){
-    int elem, prev;
-    fseek(file, 0, SEEK_END);
-    int indexes[2] = {bound == NULL ? 0 : bound[0], bound == NULL ? ftell(file) / sizeof(int) - 1 : bound[1]};
-    int index = (type ? indexes[1] : indexes[0]);
-    fseek(file, (type ? indexes[0] : indexes[1]) * sizeof(int), SEEK_SET);
-    fread(&prev, sizeof(int), 1, file);
-    for (index; (type ? index >= indexes[0] : index < indexes[1] + 1); (index += (1 - 2 * type))){
-        fseek(file, index * sizeof(int), SEEK_SET);
-        fread(&elem, sizeof(int), 1, file);
-        fseek(file, index * sizeof(int), SEEK_SET);
-        fwrite(&prev, sizeof(int), 1, file);
-        prev = elem;
-    }
-}
-
