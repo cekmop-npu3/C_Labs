@@ -9,3 +9,6 @@ target_include_directories(2 PRIVATE utils)
 
 add_executable(3 src/3.c utils/fileHandler.c)
 target_include_directories(3 PRIVATE utils)
+
+add_executable(main src/main.c utils/fileHandler.c)
+target_include_directories(main PRIVATE utils)
