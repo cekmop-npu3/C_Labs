@@ -10,8 +10,6 @@ Array *initArray(){
 
 
 bool addFigure(Array *array, Figure *figure){
-    if (array->size + 1 > MaxStrSize)
-        return false;
     array->figures = realloc(array->figures, ++array->size * sizeof(Figure *));
     array->figures[array->size - 1] = figure;
     return true;

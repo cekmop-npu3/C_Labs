@@ -22,7 +22,7 @@ typedef enum {
 
 typedef struct {
     Type type;
-    Value *value;
+    Value value;
 } Elem;
 
 

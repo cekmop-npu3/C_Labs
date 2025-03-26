@@ -3,8 +3,7 @@
 
 void freeElem(Elem *elem){
     if (elem->type == typeStr)
-        free(elem->value->Str);
-    free(elem->value);
+        free(elem->value.Str);
     free(elem);
 }
 
@@ -70,32 +69,26 @@ Elem *input(char *message, ...){
         fprintf(stderr, "Memory allocation error");
         goto cleanup;
     }
-    elem->value = malloc(sizeof(Value));
-    if (elem->value == NULL){
-        fprintf(stderr, "Memory allocation error");
-        free(elem);
-        goto cleanup;
-    }
     switch (elem->type = type){
         case typeInt:
-            elem->value->Int = sign * onIntType(result[0], partsSizes[0]);
+            elem->value.Int = sign * onIntType(result[0], partsSizes[0]);
             break;
         case typeDouble:
             if (partsSizes[1]){
-                elem->value->Double = sign * (onIntType(result[0], partsSizes[0]) + onIntType(result[1], partsSizes[1]) / pow(10, partsSizes[1]));
+                elem->value.Double = sign * (onIntType(result[0], partsSizes[0]) + onIntType(result[1], partsSizes[1]) / pow(10, partsSizes[1]));
                 break;
             }
             elem->type = typeStr;
         case typeStr:
-            elem->value->Str = malloc((rawSize + 1) * sizeof(char));
-            if (elem->value->Str == NULL){
+            elem->value.Str = malloc((rawSize + 1) * sizeof(char));
+            if (elem->value.Str == NULL){
                 fprintf(stderr, "Memory allocation error\n");
                 free(elem);
                 elem = NULL;
                 goto cleanup;
             }
-            strcpy(elem->value->Str, raw);
-            elem->value->Str[rawSize] = '\0';
+            strcpy(elem->value.Str, raw);
+            elem->value.Str[rawSize] = '\0';
             break;
     }
     cleanup:
