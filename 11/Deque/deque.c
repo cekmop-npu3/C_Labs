@@ -1,13 +1,14 @@
 #include <deque.h>
 
 
-Item *initItem(void *data, Print printFunc, Free freeFunc){
+Item *initItem(void *data, void *meta, Print printFunc, Free freeFunc){
     Item *item = malloc(sizeof(Item));
     if (item == NULL){
         fprintf(stderr, "Cannot allocate memory for Item\n");
         return NULL;
     }
     item->data = data;
+    item->meta = meta;
     item->freeFunc = freeFunc;
     item->printFunc = printFunc;
     return item;
@@ -100,4 +101,51 @@ Item *pop(Deque *deque, int index){
     deque->sequence = tmpSequence;
     --deque->len;
     return item;
+}
+
+
+bool equalBase(Item *item1, Item *item2){
+    return item1->data == item2->data;
+}
+
+
+bool hasItem(Deque *deque, Item *item, Equal equal){
+    equal = equal != NULL ? equal : equalBase;
+    for (int i = 0; i < deque->len; i++)
+        if (equal(item, deque->sequence[i])){
+            freeItem(item);
+            return true;
+        }
+    freeItem(item);
+    return false;
+}
+
+
+void removeItem(Deque *deque, Item *item, Equal equal){
+    equal = equal != NULL ? equal : equalBase;
+    if (!deque->len){
+        printf("[WARNING] Deque is already empty\n");
+        freeItem(item);
+        return;
+    }
+    Item **tmpSequence = NULL;
+    Item **temp = NULL;
+    int shift = 0;
+    for (int i = 0; i < deque->len; i++)
+        if (equal(item, deque->sequence[i]) && ++shift)
+            freeItem(deque->sequence[i]);
+        else {
+            temp = realloc(tmpSequence, sizeof(Item *) * (i - shift + 1));
+            if (temp == NULL){
+                fprintf(stderr, "Memory allocation error at Deque.remove\n");
+                freeItem(item);
+                return;
+            }
+            tmpSequence = temp;
+            tmpSequence[i - shift] = deque->sequence[i];    
+        }
+    freeItem(item);
+    free(deque->sequence);
+    deque->sequence = tmpSequence;
+    deque->len -= shift;
 }

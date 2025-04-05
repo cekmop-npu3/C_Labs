@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 
 typedef void (*Print)(void *);
@@ -13,9 +14,12 @@ typedef void (*Free)(void *);
 
 typedef struct {
     void *data;
+    void *meta;
     Print printFunc;
     Free freeFunc;
 } Item;
+
+typedef bool (*Equal)(Item *, Item *);
 
 
 typedef struct {
@@ -25,7 +29,7 @@ typedef struct {
 } Deque;
 
 
-Item *initItem(void *data, Print printFunc, Free freeFunc);
+Item *initItem(void *data, void *meta, Print printFunc, Free freeFunc);
 
 void printItem(Item *item);
 
@@ -40,6 +44,12 @@ void freeDeque(void *dequeRaw);
 void append(Deque *deque, Item *item);
 
 Item *pop(Deque *deque, int index);
+
+bool equalBase(Item *item1, Item *item2);
+
+bool hasItem(Deque *deque, Item *item, Equal equal);
+
+void removeItem(Deque *deque, Item *item, Equal equal);
 
 
 #endif
