@@ -2,15 +2,10 @@
 #define EVAL_H
 
 #include <deque.h>
+#include <ctype.h>
 
 
-void printChar(void *data);
-
-bool equal(Item *item1, Item *item2);
-
-void setList(Deque *deque, const char list[]);
-
-Deque *infixToPostfix(const char *exp);
+bool hasError(const char *exp);
 
 
 #endif
