@@ -1,15 +1,8 @@
 #include <eval.h>
-
-
-void printInt(void *data){
-    printf("%d", *(int *) data);
-}
-
-void printString(void *data){
-    printf("%s", (char *) data);
-}
   
 
 int main(){
-    infixToPostfix("(-12+(((23*45)-23");
+    if (hasError("3.14*(2+1.5)+34"))
+        return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
