@@ -45,8 +45,6 @@ void append(Deque *deque, Item *item);
 
 Item *pop(Deque *deque, int index);
 
-bool equalBase(Item *item1, Item *item2);
-
 bool hasItem(Deque *deque, Item *item, Equal equal);
 
 void removeItem(Deque *deque, Item *item, Equal equal);

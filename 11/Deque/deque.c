@@ -104,7 +104,7 @@ Item *pop(Deque *deque, int index){
 }
 
 
-bool equalBase(Item *item1, Item *item2){
+static bool equalBase(Item *item1, Item *item2){
     return item1->data == item2->data;
 }
 
