@@ -1,8 +1,29 @@
 #include <eval.h>
 
 
+static int priority(char c){
+    switch (c){
+        case '(':
+        case ')':
+            return 3;
+        case '*':
+        case '/':
+            return 2;
+        case '+':
+        case '-':
+            return 1;
+    }
+    return 0;
+}
+
+
 static void printChar(void *data){
     printf("%c", *(char *) data);
+}
+
+
+static void printString(void *data){
+    printf("%s", (char *) data);
 }
 
 
@@ -20,14 +41,29 @@ static void setList(Deque *deque, const char list[]){
 }
 
 
+static char *extendString(char *string, char c){
+    size_t len = string != NULL ? strlen(string) : 0;
+    char *tmpString = (char *) realloc(string, sizeof(char) * (len + 2));
+    if (tmpString == NULL){
+        free(string);
+        return NULL;
+    }
+    tmpString[len] = c;
+    tmpString[len + 1] = '\0';
+    return tmpString;
+}
+    
+    
 bool hasError(const char *exp){
     Deque *expectedValues = initDeque(17);
     setList(expectedValues, "0123456789-(");
     bool firstMinus = true;
     bool hasDot = false;
     int brackets[] = {0, 0};
-    for (size_t j = 0; j < strlen(exp) + 1; (isspace(exp[j + 1]) ? j += 2 : j++)){
+    for (size_t j = 0; j < strlen(exp) + 1; j++){
         if (!hasItem(expectedValues, initItem((void *) &exp[j], "char", printChar, NULL), equal)){
+            if (isspace(exp[j]) && !((isdigit(exp[j - 1]) || exp[j - 1] == '.') && (isdigit(exp[j + 1]) || exp[j + 1] == '.')))
+                continue;
             if (j == strlen(exp) && (isdigit(exp[j - 1]) || exp[j - 1] == ')'))
                 break;
             fprintf(stderr, "%s\n", exp);
@@ -52,6 +88,48 @@ bool hasError(const char *exp){
     if (brackets[0] != brackets[1])
         return (bool) fprintf(stderr, "[SyntaxError] Brackets count does not match\n");
     return false;
+}
+
+
+Deque *infixToPostfix(const char *exp){
+    Deque *postfix = initDeque(100);
+    Deque *operands = initDeque(20);
+    bool firstMinus = true;
+    bool newDigit = true;
+    char *tmpString;
+    Item *tmpItem;
+    append(postfix, initItem(NULL, NULL, printString, free));
+    for (size_t j = 0; j < strlen(exp); (isspace(exp[j + 1]) ? j += 2 : j++)){
+        if ((isdigit(exp[j]) || exp[j] == '.') && !(newDigit = false)){
+            if ((tmpString = extendString(postfix->sequence[postfix->len - 1]->data, exp[j])) == NULL){
+                fprintf(stderr, "Memory allocation error at infixToPostfix\n");
+                freeDeque(postfix);
+                freeDeque(operands);
+                return NULL;
+            }
+            postfix->sequence[postfix->len - 1]->data = tmpString;
+        }
+        else {
+            if (exp[j] == '(' && (firstMinus = true))
+                append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
+            else if (exp[j] == ')')
+                while (operands->len && *(char *) (tmpItem = pop(operands, -1))->data != '(')
+                    append(postfix, tmpItem);
+            else {
+                while (operands->len && priority(*(char *) operands->sequence[operands->len - 1]->data) >= priority(exp[j]))
+                    append(postfix, pop(operands, -1));
+                append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
+            }
+            if (!newDigit)
+                append(postfix, initItem(NULL, NULL, printString, free));
+            newDigit = true;
+        }
+    }
+    int len = operands->len;
+    for (int i = 0; i < len; i++)
+        append(postfix, pop(operands, -1));
+    freeDeque(operands);
+    return postfix;
 }
 
 

@@ -7,5 +7,7 @@
 
 bool hasError(const char *exp);
 
+Deque *infixToPostfix(const char *exp);
+
 
 #endif
