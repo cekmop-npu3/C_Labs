@@ -2,7 +2,7 @@
   
 
 int main(){
-    const char *exp = "(-13.4+34)*12";
+    const char *exp = "12*23+34*45-37";
     if (hasError(exp))
         return EXIT_FAILURE;
     Deque *postfix = infixToPostfix(exp);

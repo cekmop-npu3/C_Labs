@@ -109,12 +109,13 @@ Deque *infixToPostfix(const char *exp){
         }
         if (exp[j] == '(' && (firstMinus = true))
             append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
-        else if (exp[j] == ')'){
+        else if (exp[j] == ')' && !(firstMinus = false)){
             while (operands->len && *(char *) (tmpItem = pop(operands, -1))->data != '(')
                 append(postfix, tmpItem);
             freeItem(tmpItem);
         }
         else {
+            firstMinus = false;
             while (operands->len && priority(*(char *) operands->sequence[operands->len - 1]->data) >= priority(exp[j]))
                 append(postfix, pop(operands, -1));
             append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
