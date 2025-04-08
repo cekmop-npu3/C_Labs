@@ -14,6 +14,11 @@ static int priority(char c){
 }
 
 
+static void printDouble(void *data){
+    printf("%.2f", *(double *) data);
+}
+
+
 static void printChar(void *data){
     printf("%c", *(char *) data);
 }
@@ -25,7 +30,7 @@ static void printString(void *data){
 
 
 static bool equal(Item *item1, Item *item2){
-    return !strcmp(item1->meta, "char") && !strcmp(item2->meta, "char") && *(char *) item1->data == *(char *) item2->data;
+    return  *(char *) item1->data == *(char *) item2->data;
 }
 
 
@@ -34,7 +39,7 @@ static void setList(Deque *deque, const char list[]){
         freeItem(deque->sequence[i]);
     deque->len = 0;
     for (size_t j = 0; j < strlen(list); j++)
-        append(deque, initItem((void *) &list[j], "char", printChar, NULL));
+        append(deque, initItem((void *) &list[j], printChar, NULL));
 }
 
 
@@ -49,6 +54,25 @@ static char *extendString(char *string, char c){
     tmpString[len + 1] = '\0';
     return tmpString;
 }
+
+
+static double evalExp(Item *item1, Item *item2, char operand){
+    double num1 = item1->printFunc == printDouble ? *(double *) item1->data : atof(item1->data);
+    double num2 = item2->printFunc == printDouble ? *(double *) item2->data : atof(item2->data);
+    freeItem(item1);
+    freeItem(item2);
+    switch (operand){
+        case '+':
+            return num1 + num2;
+        case '-':
+            return num1 - num2;
+        case '*':
+            return num1 * num2;
+        case '/':
+            return num1 / num2;
+    }
+    return 0.0;
+}
     
     
 bool hasError(const char *exp){
@@ -58,7 +82,7 @@ bool hasError(const char *exp){
     bool hasDot = false;
     int brackets[] = {0, 0};
     for (size_t j = 0; j < strlen(exp) + 1; j++){
-        if (!hasItem(expectedValues, initItem((void *) &exp[j], "char", printChar, NULL), equal)){
+        if (!hasItem(expectedValues, initItem((void *) &exp[j], printChar, NULL), equal)){
             if (isspace(exp[j]) && !((isdigit(exp[j - 1]) || exp[j - 1] == '.') && (isdigit(exp[j + 1]) || exp[j + 1] == '.')))
                 continue;
             if (j == strlen(exp) && (isdigit(exp[j - 1]) || exp[j - 1] == ')'))
@@ -95,7 +119,7 @@ Deque *infixToPostfix(const char *exp){
     bool newDigit = true;
     char *tmpString;
     Item *tmpItem;
-    append(postfix, initItem(NULL, NULL, printString, free));
+    append(postfix, initItem(NULL, printString, free));
     for (size_t j = 0; j < strlen(exp); (isspace(exp[j + 1]) ? j += 2 : j++)){
         if ((isdigit(exp[j]) || exp[j] == '.' || (exp[j] == '-' && firstMinus)) && !(newDigit = false)){
             if ((tmpString = extendString(postfix->sequence[postfix->len - 1]->data, exp[j])) == NULL){
@@ -108,7 +132,7 @@ Deque *infixToPostfix(const char *exp){
             continue;
         }
         if (exp[j] == '(' && (firstMinus = true))
-            append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
+            append(operands, initItem((void *) &exp[j], printChar, NULL));
         else if (exp[j] == ')' && !(firstMinus = false)){
             while (operands->len && *(char *) (tmpItem = pop(operands, -1))->data != '(')
                 append(postfix, tmpItem);
@@ -118,17 +142,37 @@ Deque *infixToPostfix(const char *exp){
             firstMinus = false;
             while (operands->len && priority(*(char *) operands->sequence[operands->len - 1]->data) >= priority(exp[j]))
                 append(postfix, pop(operands, -1));
-            append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
+            append(operands, initItem((void *) &exp[j], printChar, NULL));
         }
         if (!newDigit)
-            append(postfix, initItem(NULL, NULL, printString, free));
+            append(postfix, initItem(NULL, printString, free));
         newDigit = true;
     }
-    int len = operands->len;
-    for (int i = 0; i < len; i++)
+    while (operands->len)
         append(postfix, pop(operands, -1));
     freeDeque(operands);
     return postfix;
+}
+
+
+double evalPostfix(Deque *postfix){
+    Deque *deque = initDeque(100);
+    Item *item;
+    double *resultP;
+    double result;
+    while (postfix->len){
+        if ((item = pop(postfix, 0))->printFunc == printChar){
+            resultP = malloc(sizeof(double));
+            result = evalExp(pop(deque, -1), pop(deque, -1), *(char *) item->data);
+            *resultP = result;
+            append(deque, initItem(resultP, printDouble, free));
+            freeItem(item);
+            continue;
+        }
+        append(deque, item);
+    }
+    freeDeque(deque);
+    return result;
 }
 
 

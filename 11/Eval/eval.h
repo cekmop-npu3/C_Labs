@@ -9,5 +9,7 @@ bool hasError(const char *exp);
 
 Deque *infixToPostfix(const char *exp);
 
+double evalPostfix(Deque *postfix);
+
 
 #endif

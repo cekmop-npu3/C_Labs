@@ -14,7 +14,6 @@ typedef void (*Free)(void *);
 
 typedef struct {
     void *data;
-    void *meta;
     Print printFunc;
     Free freeFunc;
 } Item;
@@ -29,7 +28,7 @@ typedef struct {
 } Deque;
 
 
-Item *initItem(void *data, void *meta, Print printFunc, Free freeFunc);
+Item *initItem(void *data, Print printFunc, Free freeFunc);
 
 void printItem(Item *item);
 
