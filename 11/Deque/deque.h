@@ -49,5 +49,7 @@ bool hasItem(Deque *deque, Item *item, Equal equal);
 
 void removeItem(Deque *deque, Item *item, Equal equal);
 
+void insert(Deque *deque, Item *item, int index);
+
 
 #endif

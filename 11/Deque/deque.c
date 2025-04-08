@@ -149,3 +149,33 @@ void removeItem(Deque *deque, Item *item, Equal equal){
     deque->sequence = tmpSequence;
     deque->len -= shift;
 }
+
+
+void insert(Deque *deque, Item *item, int index){
+    while (index < 0)
+        index = deque->len + index + 1;
+    if (index > deque->len){
+        fprintf(stderr, "Deque index out of range\n");
+        freeItem(item);
+        return;
+    }
+    if ((deque->len + 1) > deque->maxSize){
+        if (index == deque->len){
+            fprintf(stderr, "Cannot insert item at index %d\n", index);
+            freeItem(item);
+            return;
+        }
+        printf("[WARNING] Deque max size exceeded, items will be shifted\n");
+        freeItem(deque->sequence[--deque->len]);
+    }
+    Item **tmpSequence = malloc(sizeof(Item *) * ++deque->len);
+    if (tmpSequence == NULL){
+        fprintf(stderr, "Memory allocation error at Deque.append\n");
+        freeItem(item);
+        return;
+    }
+    for (int i = 0; i < deque->len; i++)
+        tmpSequence[i] = i == index ? item : deque->sequence[i < index ? i : i - 1];
+    free(deque->sequence);
+    deque->sequence = tmpSequence;
+}
