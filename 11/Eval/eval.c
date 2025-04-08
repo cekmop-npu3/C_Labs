@@ -3,9 +3,6 @@
 
 static int priority(char c){
     switch (c){
-        case '(':
-        case ')':
-            return 3;
         case '*':
         case '/':
             return 2;
@@ -100,7 +97,7 @@ Deque *infixToPostfix(const char *exp){
     Item *tmpItem;
     append(postfix, initItem(NULL, NULL, printString, free));
     for (size_t j = 0; j < strlen(exp); (isspace(exp[j + 1]) ? j += 2 : j++)){
-        if ((isdigit(exp[j]) || exp[j] == '.') && !(newDigit = false)){
+        if ((isdigit(exp[j]) || exp[j] == '.' || (exp[j] == '-' && firstMinus)) && !(newDigit = false)){
             if ((tmpString = extendString(postfix->sequence[postfix->len - 1]->data, exp[j])) == NULL){
                 fprintf(stderr, "Memory allocation error at infixToPostfix\n");
                 freeDeque(postfix);
@@ -108,22 +105,23 @@ Deque *infixToPostfix(const char *exp){
                 return NULL;
             }
             postfix->sequence[postfix->len - 1]->data = tmpString;
+            continue;
+        }
+        if (exp[j] == '(' && (firstMinus = true))
+            append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
+        else if (exp[j] == ')'){
+            while (operands->len && *(char *) (tmpItem = pop(operands, -1))->data != '(')
+                append(postfix, tmpItem);
+            freeItem(tmpItem);
         }
         else {
-            if (exp[j] == '(' && (firstMinus = true))
-                append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
-            else if (exp[j] == ')')
-                while (operands->len && *(char *) (tmpItem = pop(operands, -1))->data != '(')
-                    append(postfix, tmpItem);
-            else {
-                while (operands->len && priority(*(char *) operands->sequence[operands->len - 1]->data) >= priority(exp[j]))
-                    append(postfix, pop(operands, -1));
-                append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
-            }
-            if (!newDigit)
-                append(postfix, initItem(NULL, NULL, printString, free));
-            newDigit = true;
+            while (operands->len && priority(*(char *) operands->sequence[operands->len - 1]->data) >= priority(exp[j]))
+                append(postfix, pop(operands, -1));
+            append(operands, initItem((void *) &exp[j], NULL, printChar, NULL));
         }
+        if (!newDigit)
+            append(postfix, initItem(NULL, NULL, printString, free));
+        newDigit = true;
     }
     int len = operands->len;
     for (int i = 0; i < len; i++)
