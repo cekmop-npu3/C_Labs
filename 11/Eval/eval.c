@@ -56,22 +56,37 @@ static char *extendString(char *string, char c){
 }
 
 
-static double evalExp(Item *item1, Item *item2, char operand){
+static double *evalExp(Item *item1, Item *item2, char operand){
     double num1 = item1->printFunc == printDouble ? *(double *) item1->data : atof(item1->data);
     double num2 = item2->printFunc == printDouble ? *(double *) item2->data : atof(item2->data);
     freeItem(item1);
     freeItem(item2);
+    double *result = malloc(sizeof(double));
+    if (result == NULL){
+        fprintf(stderr, "Memory allocation failed at evalExp\n");
+        free(result);
+        return NULL;
+    }
     switch (operand){
         case '+':
-            return num1 + num2;
+            *result = num1 + num2;
+            break;
         case '-':
-            return num1 - num2;
+            *result = num1 - num2;
+            break;
         case '*':
-            return num1 * num2;
+            *result = num1 * num2;
+            break;
         case '/':
-            return num1 / num2;
+            if (!num2){
+                fprintf(stderr, "ZeroDivision error, terminating\n");
+                free(result);
+                return NULL;
+            }
+            *result = num1 / num2;
+            break;
     }
-    return 0.0;
+    return result;
 }
     
     
@@ -81,11 +96,9 @@ bool hasError(const char *exp){
     bool firstMinus = true;
     bool hasDot = false;
     int brackets[] = {0, 0};
-    for (size_t j = 0; j < strlen(exp) + 1; j++){
+    for (size_t j = 0; j < strlen(exp) + 1; (isspace(exp[j + 1]) ? j += 2 : j++)){
         if (!hasItem(expectedValues, initItem((void *) &exp[j], printChar, NULL), equal)){
-            if (isspace(exp[j]) && !((isdigit(exp[j - 1]) || exp[j - 1] == '.') && (isdigit(exp[j + 1]) || exp[j + 1] == '.')))
-                continue;
-            if (j == strlen(exp) && (isdigit(exp[j - 1]) || exp[j - 1] == ')'))
+            if (j == strlen(exp) && (isdigit(exp[j - 1]) || exp[j - 1] == ')' || isspace(exp[j - 1])))
                 break;
             fprintf(stderr, "%s\n", exp);
             for (size_t i = 0; i < strlen(exp) + 1; i++)
@@ -119,9 +132,10 @@ Deque *infixToPostfix(const char *exp){
     bool newDigit = true;
     char *tmpString;
     Item *tmpItem;
-    append(postfix, initItem(NULL, printString, free));
     for (size_t j = 0; j < strlen(exp); (isspace(exp[j + 1]) ? j += 2 : j++)){
-        if ((isdigit(exp[j]) || exp[j] == '.' || (exp[j] == '-' && firstMinus)) && !(newDigit = false)){
+        if ((isdigit(exp[j]) || exp[j] == '.' || (exp[j] == '-' && firstMinus)) && !(firstMinus = false)){
+            if (newDigit && !(newDigit = false))
+                append(postfix, initItem(NULL, printString, free));
             if ((tmpString = extendString(postfix->sequence[postfix->len - 1]->data, exp[j])) == NULL){
                 fprintf(stderr, "Memory allocation error at infixToPostfix\n");
                 freeDeque(postfix);
@@ -144,8 +158,6 @@ Deque *infixToPostfix(const char *exp){
                 append(postfix, pop(operands, -1));
             append(operands, initItem((void *) &exp[j], printChar, NULL));
         }
-        if (!newDigit)
-            append(postfix, initItem(NULL, printString, free));
         newDigit = true;
     }
     while (operands->len)
@@ -155,24 +167,26 @@ Deque *infixToPostfix(const char *exp){
 }
 
 
-double evalPostfix(Deque *postfix){
+Item *evalPostfix(Deque *postfix){
     Deque *deque = initDeque(100);
     Item *item;
-    double *resultP;
-    double result;
+    double *result;
     while (postfix->len){
         if ((item = pop(postfix, 0))->printFunc == printChar){
-            resultP = malloc(sizeof(double));
             result = evalExp(pop(deque, -1), pop(deque, -1), *(char *) item->data);
-            *resultP = result;
-            append(deque, initItem(resultP, printDouble, free));
             freeItem(item);
+            if (result == NULL){
+                freeDeque(deque);
+                return NULL;
+            }
+            append(deque, initItem(result, printDouble, free));
             continue;
         }
         append(deque, item);
     }
+    item = pop(deque, -1);
     freeDeque(deque);
-    return result;
+    return item;
 }
 
 
