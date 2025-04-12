@@ -5,6 +5,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -fsanitize=address -g")
 endif()
 
-add_executable(main src/main.c Deque/deque.c Eval/eval.c)
+add_executable(main src/main.c Deque/deque.c Eval/eval.c Handlers/input.c)
 
-target_include_directories(main PRIVATE Deque Eval)
+target_include_directories(main PRIVATE Deque Eval Handlers)
