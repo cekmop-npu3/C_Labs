@@ -1,15 +1,15 @@
 #ifndef EVAL_H
 #define EVAL_H
 
-#include <deque.h>
+#include <list.h>
 #include <ctype.h>
 
 
 bool hasError(const char *exp);
 
-Deque *infixToPostfix(const char *exp);
+List *infixToPostfix(const char *exp);
 
-Item *evalPostfix(Deque *postfix);
+Item *evalPostfix(List *postfix);
 
 
 #endif

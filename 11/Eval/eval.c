@@ -34,12 +34,12 @@ static bool equal(Item *item1, Item *item2){
 }
 
 
-static void setList(Deque *deque, const char list[]){
-    for (int i = 0; i < deque->len; i++)
-        freeItem(deque->sequence[i]);
-    deque->len = 0;
-    for (size_t j = 0; j < strlen(list); j++)
-        append(deque, initItem((void *) &list[j], printChar, NULL));
+static void setList(List *list, const char seq[]){
+    for (int i = 0; i < list->len; i++)
+        freeItem(list->sequence[i]);
+    list->len = 0;
+    for (size_t j = 0; j < strlen(seq); j++)
+        append(list, initItem((void *) &seq[j], printChar, NULL));
 }
 
 
@@ -91,22 +91,25 @@ static double *evalExp(Item *item1, Item *item2, char operand){
     
     
 bool hasError(const char *exp){
-    Deque *expectedValues = initDeque(17);
+    Item *cmp;
+    List *expectedValues = initList(17);
     setList(expectedValues, "0123456789-(");
     bool firstMinus = true;
     bool hasDot = false;
     int brackets[] = {0, 0};
     for (size_t j = 0; j < strlen(exp) + 1; (isspace(exp[j + 1]) ? j += 2 : j++)){
-        if (!hasItem(expectedValues, initItem((void *) &exp[j], printChar, NULL), equal)){
+        if (!hasItem(expectedValues, (cmp = initItem((void *) &exp[j], printChar, NULL)), equal)){
+            freeItem(cmp);
             if (j == strlen(exp) && (isdigit(exp[j - 1]) || exp[j - 1] == ')' || isspace(exp[j - 1])))
                 break;
             fprintf(stderr, "%s\n", exp);
             for (size_t i = 0; i < strlen(exp) + 1; i++)
                 i == j ? fprintf(stderr, "^") : fprintf(stderr, "=");
             fprintf(stderr, "\n[SyntaxError] Invalid character at pos %ld\n", j);
-            freeDeque(expectedValues);
+            freeList(expectedValues);
             return true;
         }
+        freeItem(cmp);
         if (isdigit(exp[j]) && !(firstMinus = false))
             hasDot ? setList(expectedValues, "0123456789+-*/)") : setList(expectedValues, "0123456789.+-*/)");
         else if (exp[j] == '.' && (hasDot = true))
@@ -118,16 +121,16 @@ bool hasError(const char *exp){
         else 
             !(hasDot = false) && firstMinus ? setList(expectedValues, "0123456789") : setList(expectedValues, "0123456789(");
     }
-    freeDeque(expectedValues);
+    freeList(expectedValues);
     if (brackets[0] != brackets[1])
         return (bool) fprintf(stderr, "[SyntaxError] Brackets count does not match\n");
     return false;
 }
 
 
-Deque *infixToPostfix(const char *exp){
-    Deque *postfix = initDeque(100);
-    Deque *operands = initDeque(20);
+List *infixToPostfix(const char *exp){
+    List *postfix = initList(100);
+    List *operands = initList(20);
     bool firstMinus = true;
     bool newDigit = true;
     char *tmpString;
@@ -138,8 +141,8 @@ Deque *infixToPostfix(const char *exp){
                 append(postfix, initItem(NULL, printString, free));
             if ((tmpString = extendString(postfix->sequence[postfix->len - 1]->data, exp[j])) == NULL){
                 fprintf(stderr, "Memory allocation error at infixToPostfix\n");
-                freeDeque(postfix);
-                freeDeque(operands);
+                freeList(postfix);
+                freeList(operands);
                 return NULL;
             }
             postfix->sequence[postfix->len - 1]->data = tmpString;
@@ -162,30 +165,30 @@ Deque *infixToPostfix(const char *exp){
     }
     while (operands->len)
         append(postfix, pop(operands, -1));
-    freeDeque(operands);
+    freeList(operands);
     return postfix;
 }
 
 
-Item *evalPostfix(Deque *postfix){
-    Deque *deque = initDeque(100);
+Item *evalPostfix(List *postfix){
+    List *list = initList(100);
     Item *item;
     double *result;
     while (postfix->len){
         if ((item = pop(postfix, 0))->printFunc == printChar){
-            result = evalExp(pop(deque, -1), pop(deque, -1), *(char *) item->data);
+            result = evalExp(pop(list, -1), pop(list, -1), *(char *) item->data);
             freeItem(item);
             if (result == NULL){
-                freeDeque(deque);
+                freeList(list);
                 return NULL;
             }
-            append(deque, initItem(result, printDouble, free));
+            append(list, initItem(result, printDouble, free));
             continue;
         }
-        append(deque, item);
+        append(list, item);
     }
-    item = pop(deque, -1);
-    freeDeque(deque);
+    item = pop(list, -1);
+    freeList(list);
     return item;
 }
 

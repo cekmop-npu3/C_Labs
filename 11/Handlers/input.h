@@ -28,7 +28,7 @@ typedef struct {
 } Elem;
 
 
-void freeElem(Elem *elem);
+void freeElem(void *elemRaw);
 
 Elem *input(const char *message, ...);
 

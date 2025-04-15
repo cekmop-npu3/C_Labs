@@ -1,7 +1,8 @@
 #include <input.h>
 
 
-void freeElem(Elem *elem){
+void freeElem(void *elemRaw){
+    Elem *elem = (Elem *) elemRaw;
     if (elem->type == typeStr)
         free(elem->value.Str);
     free(elem);
