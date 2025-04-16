@@ -20,7 +20,7 @@ void printItem(Item *item){
 
 
 void freeItem(Item *item){
-    if (item->freeFunc != NULL)
+    if (item != NULL && item->freeFunc != NULL)
         item->freeFunc(item->data);
     free(item);
 }
@@ -52,6 +52,8 @@ void printList(void *listRaw){
 
 
 void freeList(void *listRaw){
+    if (listRaw == NULL)
+        return;
     List *list = (List *) listRaw;
     for (int i = 0; i < list->len; i++)
         freeItem(list->sequence[i]);

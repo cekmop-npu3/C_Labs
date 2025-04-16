@@ -5,9 +5,9 @@
 #include <ctype.h>
 
 
-bool hasError(const char *exp);
+bool hasError(char *exp);
 
-List *infixToPostfix(const char *exp);
+List *infixToPostfix(char *exp);
 
 Item *evalPostfix(List *postfix);
 

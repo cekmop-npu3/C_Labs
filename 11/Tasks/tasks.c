@@ -20,9 +20,9 @@ List *inputList(){
     Elem *maxLen = handle(typeInt, maxLenRange, "Enter max size: ");
     List *list = initList(maxLen->value.Int);
     for (int i = 0; i < maxLen->value.Int; i++){
-        if (prev != NULL && listType->value.Int == 1)
+        if (prev != NULL && listType->value.Int == DEC)
             range[1] = prev->value.Int - 1;
-        else if (prev != NULL && !listType->value.Int)
+        else if (prev != NULL && listType->value.Int == INC)
             range[0] = prev->value.Int + 1;
         append(list, initItem((prev = handle(typeInt, range, "Enter elem [%d]: ", i)), printInt, freeElem));
     }
@@ -64,4 +64,26 @@ void task2(){
     freeList(result);
     freeList(list1);
     freeList(list2);
+}
+
+
+void task3(){
+    FILE *out = fopen("Out.txt", "w");
+    if (out == NULL){
+        fprintf(stderr, "Error occured opening file\n");
+        return;
+    }
+    List *postfix = NULL;
+    Item *item = NULL;
+    Lines *lines = readLines("File.txt");
+    printLines(lines);
+    for (int i = 0; i < lines->len; i++){
+        hasError(lines->lines[i]) ? fprintf(out, "\n") : fprintf(out, "%.2f\n", *(double *) (item = evalPostfix((postfix = infixToPostfix(lines->lines[i]))))->data);
+        freeItem(item);
+        freeList(postfix);
+        item = NULL;
+        postfix = NULL;
+    }
+    freeLines(lines);
+    fclose(out);
 }

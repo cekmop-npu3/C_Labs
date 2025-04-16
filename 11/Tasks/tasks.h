@@ -2,8 +2,10 @@
 #define TASKS_H
 
 #include <input.h>
+#include <file.h>
 #include <list.h>
 #include <limits.h>
+#include <eval.h>
 
 
 typedef enum {
@@ -17,5 +19,7 @@ List *inputList();
 void task1();
 
 void task2();
+
+void task3();
 
 #endif

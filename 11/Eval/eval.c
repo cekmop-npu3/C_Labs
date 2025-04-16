@@ -90,7 +90,7 @@ static double *evalExp(Item *item1, Item *item2, char operand){
 }
     
     
-bool hasError(const char *exp){
+bool hasError(char *exp){
     Item *cmp;
     List *expectedValues = initList(17);
     setList(expectedValues, "0123456789-(");
@@ -128,7 +128,7 @@ bool hasError(const char *exp){
 }
 
 
-List *infixToPostfix(const char *exp){
+List *infixToPostfix(char *exp){
     List *postfix = initList(100);
     List *operands = initList(20);
     bool firstMinus = true;
