@@ -17,8 +17,6 @@ typedef struct {
 
 void freeLines(Lines *lines);
 
-void printLines(Lines *lines);
-
 Lines *readLines(const char *filename);
 
 

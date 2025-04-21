@@ -16,7 +16,7 @@ List *inputList(){
     double maxLenRange[2] = {1, 10};
     double range[2] = {INT_MIN, INT_MAX};
     Elem *prev = NULL;
-    Elem *listType = handle(typeInt, listTypeRange, "List type:\n0 - increasing\n1 - decreasing\n2 - default\n$ ");
+    Elem *listType = handle(typeInt, listTypeRange, "Type:\n0 - increasing\n1 - decreasing\n2 - default\n>> ");
     Elem *maxLen = handle(typeInt, maxLenRange, "Enter max size: ");
     List *list = initList(maxLen->value.Int);
     for (int i = 0; i < maxLen->value.Int; i++){
@@ -76,7 +76,6 @@ void task3(){
     List *postfix = NULL;
     Item *item = NULL;
     Lines *lines = readLines("File.txt");
-    printLines(lines);
     for (int i = 0; i < lines->len; i++){
         hasError(lines->lines[i]) ? fprintf(out, "\n") : fprintf(out, "%.2f\n", *(double *) (item = evalPostfix((postfix = infixToPostfix(lines->lines[i]))))->data);
         freeItem(item);

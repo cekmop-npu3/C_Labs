@@ -9,12 +9,6 @@ void freeLines(Lines *lines){
 }
 
 
-void printLines(Lines *lines){
-    for (int i = 0; i < lines->len; i++)
-        printf("%s\n", lines->lines[i]);
-}
-
-
 Lines *readLines(const char *filename){
     char c;
     char **tmpLines;
@@ -33,7 +27,7 @@ Lines *readLines(const char *filename){
     }
     while (fread(&c, sizeof(char), 1, file)){
         if (c == '\n' || (!lines->len && !fseek(file, 0, SEEK_SET))){
-            if ((((tmpLines = realloc(lines->lines, sizeof(char *) * ++lines->len)) == NULL) | ((tmpLines[lines->len - 1] = malloc(sizeof(char) * MaxStrSize)) == NULL)) | ((bool) (lines->lines = tmpLines) && (lines->lines[lines->len - 1][0] = '\0'))){
+            if ((((tmpLines = realloc(lines->lines, sizeof(char *) * ++lines->len)) == NULL) | ((tmpLines[lines->len - 1] = malloc(sizeof(char) * MaxStrSize)) == NULL)) | ((bool) (lines->lines = tmpLines == NULL ? lines->lines : tmpLines) && (lines->lines[lines->len - 1][0] = '\0'))){
                 freeLines(lines);
                 fprintf(stderr, "Memory allocation error at readLines\n");
                 return NULL;
