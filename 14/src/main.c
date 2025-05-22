@@ -9,5 +9,6 @@ int main(){
     addNode(b_tree, initNode(14));
     addNode(b_tree, initNode(2));
     addNode(b_tree, initNode(3));
+    deleteNode(b_tree, initNode(3));
     freeBTree(b_tree);
 }

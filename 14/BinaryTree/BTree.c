@@ -57,5 +57,74 @@ void freeBTree(BTree *b_tree){
 }
 
 
+static Node *findNode(Node **parent, Node *node){
+    // On non-NULL return, "Parent" stores pointer to the parent of a found node 
+    if ((*parent)->left != NULL && node->value < (*parent)->value){
+        if ((*parent)->left->value == node->value)
+            return (*parent)->left;
+        else {
+            *parent = (*parent)->left;
+            return findNode(parent, node);
+        }
+    }
+    if ((*parent)->right != NULL && node->value > (*parent)->value){
+        if ((*parent)->right->value == node->value)
+            return (*parent)->right;
+        else {
+            *parent = (*parent)->right;
+            findNode(parent, node);
+        }
+    }
+    return NULL;
+}
 
+
+static void assignNewChild(Node *parent, Node *nodeToDelete, Node *node){
+    if (parent->left != NULL && parent->left->value == nodeToDelete->value)
+        parent->left = node;
+    else
+        parent->right = node;
+    freeNode(nodeToDelete);
+}
+
+
+static Node *findTheSmallestParent(Node *node){
+    return node->left == NULL || node->left->left == NULL ? node : findTheSmallestParent(node->left);
+}
+
+
+bool deleteNode(BTree *b_tree, Node *node){
+    Node *nodeToDelete;
+    Node *temp;
+    if (b_tree == NULL){
+        printf("Cannot delete from an empty BTree\n");
+        return false;
+    }
+    Node *parent = b_tree->root;
+    if ((nodeToDelete = findNode(&parent, node)) == NULL){
+        freeNode(node);
+        return false;
+    }
+    if (nodeToDelete->left == NULL && nodeToDelete->right == NULL)
+        assignNewChild(parent, nodeToDelete, NULL);
+    else if (nodeToDelete->left != NULL && nodeToDelete->right == NULL)
+        assignNewChild(parent, nodeToDelete, nodeToDelete->left);
+    else if (nodeToDelete->left == NULL && nodeToDelete->right != NULL)
+        assignNewChild(parent, nodeToDelete, nodeToDelete->right);
+    else {
+        Node *smallestParent = findTheSmallestParent(nodeToDelete->right);
+        if (smallestParent->left == NULL){
+            nodeToDelete->value = smallestParent->value;
+            freeNode(smallestParent);
+            nodeToDelete->right = NULL;
+        }
+        else {
+            nodeToDelete->value = smallestParent->left->value;
+            freeNode(smallestParent->left);
+            smallestParent->left = NULL;
+        }
+    }
+    freeNode(node);
+    return true;
+}
 
