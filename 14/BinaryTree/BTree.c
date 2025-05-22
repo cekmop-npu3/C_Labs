@@ -42,7 +42,7 @@ bool addNode(BTree *b_tree, Node *node){
 }
 
 
-void freeNode(Node *node){
+static void freeNode(Node *node){
     if (node == NULL)
         return;
     freeNode(node->left);
@@ -88,14 +88,13 @@ static void assignNewChild(Node *parent, Node *nodeToDelete, Node *node){
 }
 
 
-static Node *findTheSmallestParent(Node *node){
+static inline Node *findTheSmallestParent(Node *node){
     return node->left == NULL || node->left->left == NULL ? node : findTheSmallestParent(node->left);
 }
 
 
 bool deleteNode(BTree *b_tree, Node *node){
     Node *nodeToDelete;
-    Node *temp;
     if (b_tree == NULL){
         printf("Cannot delete from an empty BTree\n");
         return false;
@@ -115,8 +114,9 @@ bool deleteNode(BTree *b_tree, Node *node){
         Node *smallestParent = findTheSmallestParent(nodeToDelete->right);
         if (smallestParent->left == NULL){
             nodeToDelete->value = smallestParent->value;
+            nodeToDelete->right = smallestParent->right == NULL ? NULL : smallestParent->right;
+            smallestParent->right = NULL;
             freeNode(smallestParent);
-            nodeToDelete->right = NULL;
         }
         else {
             nodeToDelete->value = smallestParent->left->value;
@@ -124,6 +124,7 @@ bool deleteNode(BTree *b_tree, Node *node){
             smallestParent->left = NULL;
         }
     }
+    b_tree->size--;
     freeNode(node);
     return true;
 }
