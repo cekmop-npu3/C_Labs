@@ -2,7 +2,8 @@
 #define TASKS_H
 
 #include <input.h>
-#include <list.h>
+#include <queue.h>
+#include <deque.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <regex.h>
@@ -10,11 +11,17 @@
 
 typedef enum {
     ADD,
-    INSERT,
+    DELETE,
+    PRINT_QUEUE
+} QueueAction;
+
+
+typedef enum {
+    APPEND,
+    POP_LEFT,
     POP,
-    PRINT,
-    REMOVE
-} Action;
+    PRINT_DEQUE
+} DequeAction;
 
 
 void task1();

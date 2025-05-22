@@ -11,68 +11,8 @@ static void printInt(void *data){
 }
 
 
-static bool equal(Item *item1, Item *item2){
-    return  ((Elem *) item1->data)->value.Str[0] == ((Elem *) item2->data)->value.Str[0];
-}
-
-
-static void listMenu(Elem *maxSize, Elem *ref){
-    List *list = initList(maxSize->value.Int);
-    double actionRange[2] = {0, 4};
-    Elem *option;
-    Elem *elem;
-    Elem *index;
-    Item *item;
-    while (true){
-        option = handle(typeInt, actionRange, "0 to add\n1 to insert\n2 to pop\n3 to print\n4 to remove\n>> ");
-        switch (option->value.Int){
-            case ADD:
-                if ((elem = handle(typeStr, NULL, "Enter char: "))->value.Str[0] == ref->value.Str[0]){
-                    freeElem(elem);
-                    printList(list);
-                    printf("\n");
-                    freeList(list);
-                    freeElem(option);
-                    return;
-                }
-                append(list, initItem(elem, print, freeElem));
-                break;
-            case INSERT:
-                if ((elem = handle(typeStr, NULL, "Enter char: "))->value.Str[0] == ref->value.Str[0]){
-                    freeElem(elem);
-                    printList(list);
-                    printf("\n");
-                    freeList(list);
-                    freeElem(option);
-                    return;
-                }
-                insert(list, initItem(elem, print, freeElem), (index = handle(typeInt, NULL, "Enter the index: "))->value.Int);
-                freeElem(index);
-                break;
-            case POP:
-                index = handle(typeInt, NULL, "Enter the index to delete: ");
-                if ((item = pop(list, index->value.Int)) != NULL){
-                    printItem(item);
-                    printf("\n");
-                    freeItem(item);
-                }
-                freeElem(index);
-                break;
-            case PRINT:
-                printList(list);
-                printf("\n");
-                break;
-            case REMOVE:
-                removeItem(list, initItem(handle(typeStr, NULL, "Enter char to remove: "), print, freeElem), equal);
-                break;
-        }
-        freeElem(option);
-    }
-}
-
-
-static List *getList(const char *str, const char *pattern){
-    List *list = initList(100);
+static Queue *getQueue(const char *str, const char *pattern){
+    Queue *queue = initQueue(100);
     regex_t regex;
     regcomp(&regex, pattern, REG_EXTENDED);
     regmatch_t matches[1];
@@ -82,52 +22,146 @@ static List *getList(const char *str, const char *pattern){
         string[2] = '\0';
         int *res = malloc(sizeof(int));
         *res = atoi(string);
-        append(list, initItem(res, printInt, free));
+        add(queue, initItem(res, printInt, free));
         str += matches[0].rm_eo;
     }
     regfree(&regex);
-    return list;
+    return queue;
+}
+
+
+static void queueMenu(Elem *maxSize, Elem *ref){
+    Queue *queue = initQueue(maxSize->value.Int);
+    double actionRange[2] = {0, 3};
+    Elem *option;
+    Elem *elem;
+    Item *item;
+    while (true){
+        option = handle(typeInt, actionRange, "0 to add\n1 to pop\n2 to print\n>> ");
+        switch (option->value.Int){
+            case ADD:
+                if ((elem = handle(typeStr, NULL, "Enter char: "))->value.Str[0] == ref->value.Str[0]){
+                    freeElem(elem);
+                    printQueue(queue);
+                    printf("\n");
+                    freeElem(option);
+                    freeQueue(queue);
+                    return;
+                }
+                add(queue, initItem(elem, print, freeElem));
+                break;
+            case DELETE:
+                if ((item = delete(queue)) != NULL){
+                    printItem(item);
+                    printf("\n");
+                    freeItem(item);
+                }
+                break;
+            case PRINT_QUEUE:
+                printQueue(queue);
+                printf("\n");
+                break;
+        }
+        freeElem(option);
+    }
+}
+
+
+static void dequeMenu(Elem *maxSize, Elem *ref){
+    Deque *deque = initDeque(maxSize->value.Int);
+    double actionRange[2] = {0, 3};
+    bool right = true;
+    Elem *option;
+    Elem *elem;
+    Item *item;
+    while (true){
+        option = handle(typeInt, actionRange, "0 to append\n1 to pop\n2 to popLeft\n3 to print\n>> ");
+        switch (option->value.Int){
+            case APPEND:
+                if ((elem = handle(typeStr, NULL, "Enter char: "))->value.Str[0] == ref->value.Str[0]){
+                    freeElem(elem);
+                    printDeque(deque);
+                    printf("\n");
+                    freeElem(option);
+                    freeDeque(deque);
+                    return;
+                }
+                if (right ^= 1)
+                    appendLeft(deque, initItem(elem, print, freeElem));
+                else
+                    append(deque, initItem(elem, print, freeElem));
+                break;
+            case POP:
+                if ((item = pop(deque)) != NULL){
+                    printItem(item);
+                    printf("\n");
+                    freeItem(item);
+                }
+                break;
+            case POP_LEFT:
+                if ((item = popLeft(deque)) != NULL){
+                    printItem(item);
+                    printf("\n");
+                    freeItem(item);
+                }
+                break;
+            case PRINT_DEQUE:
+                printDeque(deque);
+                printf("\n");
+                break;
+        }
+        freeElem(option);
+    }
 }
 
 
 void task1(){
     Elem *maxSize = handle(typeInt, NULL, "Enter max size: ");
     Elem *ref = handle(typeStr, NULL, "Enter ref: ");
-    listMenu(maxSize, ref);
+    queueMenu(maxSize, ref);
     freeElem(maxSize);
     freeElem(ref);
 }
 
 
 void task2(){
+    Elem *maxSize = handle(typeInt, NULL, "Enter max size: ");
+    Elem *ref = handle(typeStr, NULL, "Enter ref: ");
+    dequeMenu(maxSize, ref);
+    freeElem(maxSize);
+    freeElem(ref);
+}
+
+
+void task3(){
     const char *str = "12 34 3 56 1 45 67 3";
-    List *list1 = getList(str, "\\b[0-9]{2}\\b");
-    List *list2 = getList(str, "\\b[0-9]\\b");
-    List *result = initList(100);
+    Queue *queue1 = getQueue(str, "\\b[0-9]{2}\\b");
+    Queue *queue2 = getQueue(str, "\\b[0-9]\\b");
+    Queue *result = initQueue(100);
     Item *item1;
     Item *item2;
-    printList(list1);
+    printQueue(queue1);
     printf("\n");
-    printList(list2);
+    printQueue(queue2);
     printf("\n");
-    while (((item1 = pop(list1, 0)) != NULL) & ((item2 = pop(list2, 0)) != NULL)){
+    while (((item1 = delete(queue1)) != NULL) & ((item2 = delete(queue2)) != NULL)){
         int *res = malloc(sizeof(int));
         *res = *(int *) item1->data * *(int *) item2->data;
-        append(result, initItem(res, printInt, free));
+        add(result, initItem(res, printInt, free));
         freeItem(item1);
         freeItem(item2);
     }
     if (item1 != NULL)
-        insert(list1, item1, 0);
+        add(result, item1);
     if (item2 != NULL)
-        insert(list2, item2, 0);
-    while ((item1 = pop(list1, 0)) != NULL)
-        append(result, item1);
-    while ((item2 = pop(list2, 0)) != NULL)
-        append(result, item2);
-    printList(result);
+        add(result, item2);
+    while ((item1 = delete(queue1)) != NULL)
+        add(result, item1);
+    while ((item2 = delete(queue2)) != NULL)
+        add(result, item2);
+    printQueue(result);
     printf("\n");
-    freeList(result);
-    freeList(list1);
-    freeList(list2);
+    freeQueue(result);
+    freeQueue(queue1);
+    freeQueue(queue2);
 }
