@@ -129,3 +129,26 @@ bool deleteNode(BTree *b_tree, Node *node){
     return true;
 }
 
+
+static void printNode(Node *node, int space) {
+    if (node == NULL) 
+        return;
+    space += 5;
+    printNode(node->right, space);
+    printf("\n");
+    for (int i = 5; i < space; i++) {
+        printf(" ");
+    }
+    printf("%d\n", node->value);
+    printNode(node->left, space);
+}
+
+
+void printBTRee(BTree *b_tree){
+    if (b_tree == NULL || b_tree->root == NULL){
+        printf("BTree is empty\n");
+        return;
+    }
+    printNode(b_tree->root, 0);
+}
+

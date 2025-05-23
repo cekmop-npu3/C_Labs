@@ -29,5 +29,7 @@ void freeBTree(BTree *b_tree);
 
 bool deleteNode(BTree *b_tree, Node *node);
 
+void printBTRee(BTree *b_tree);
+
 
 #endif
