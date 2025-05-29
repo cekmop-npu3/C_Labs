@@ -1,6 +1,20 @@
 #include <BTree.h>
 
 
+static void printNode(Node *node, int space) {
+    if (node == NULL) 
+        return;
+    space += 5;
+    printNode(node->right, space);
+    printf("\n");
+    for (int i = 5; i < space; i++) {
+        printf(" ");
+    }
+    printf("%d\n", node->value);
+    printNode(node->left, space);
+}
+
+
 BTree *initBTree(){
     BTree *b_tree = malloc(sizeof(BTree));
     if (b_tree == NULL){
@@ -72,7 +86,7 @@ static Node *findNode(Node **parent, Node *node){
             return (*parent)->right;
         else {
             *parent = (*parent)->right;
-            findNode(parent, node);
+            return findNode(parent, node);
         }
     }
     return NULL;
@@ -93,11 +107,27 @@ static inline Node *findTheSmallestParent(Node *node){
 }
 
 
+void printBTRee(BTree *b_tree){
+    if (b_tree == NULL || b_tree->root == NULL){
+        printf("BTree is empty\n");
+        return;
+    }
+    printNode(b_tree->root, 0);
+}
+
+
 bool deleteNode(BTree *b_tree, Node *node){
     Node *nodeToDelete;
     if (b_tree == NULL){
         printf("Cannot delete from an empty BTree\n");
         return false;
+    }
+    if (node->value == b_tree->root->value){
+        freeNode(b_tree->root);
+        freeNode(node);
+        b_tree->root = NULL;
+        b_tree->size = 0;
+        return true;
     }
     Node *parent = b_tree->root;
     if ((nodeToDelete = findNode(&parent, node)) == NULL){
@@ -128,27 +158,3 @@ bool deleteNode(BTree *b_tree, Node *node){
     freeNode(node);
     return true;
 }
-
-
-static void printNode(Node *node, int space) {
-    if (node == NULL) 
-        return;
-    space += 5;
-    printNode(node->right, space);
-    printf("\n");
-    for (int i = 5; i < space; i++) {
-        printf(" ");
-    }
-    printf("%d\n", node->value);
-    printNode(node->left, space);
-}
-
-
-void printBTRee(BTree *b_tree){
-    if (b_tree == NULL || b_tree->root == NULL){
-        printf("BTree is empty\n");
-        return;
-    }
-    printNode(b_tree->root, 0);
-}
-
